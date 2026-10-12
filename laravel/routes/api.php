@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 
-Route::controller(ProductController::class)->group(function () {
-    Route::get('/products', 'getProducts')->name('get_products');
-    Route::get('/products/{id}', 'getProductItem')->whereNumber('id')->name('get_product_item');
-    Route::post('/products', 'createProduct')->name('post_products');
-    Route::match(['put', 'patch'], '/products/{id}', 'updateProduct')->whereNumber('id')->name('put_products');
-    Route::delete('/products/{id}', 'deleteProduct')->whereNumber('id')->name('delete_products');
-});
+Route::get('/products', [ProductController::class, 'getProducts']);
+Route::get('/products/{id}', [ProductController::class, 'getProductItem']);
+Route::post('/products', [ProductController::class, 'createProduct']);
+Route::put('/products/{id}', [ProductController::class, 'updateProduct']);
+Route::delete('/products/{id}', [ProductController::class, 'deleteProduct']);
