@@ -23,12 +23,16 @@ class TrainingProgramController extends AbstractController
     /**
      * READ - список усіх програм тренувань
      *
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/training-programs', name: 'get_training_programs', methods: [Request::METHOD_GET])]
-    public function getTrainingPrograms(): JsonResponse
+    public function getTrainingPrograms(Request $request): JsonResponse
     {
-        $trainingPrograms = $this->entityManager->getRepository(TrainingProgram::class)->findAll();
+        $page = (int) $request->query->get('page', 1);
+        $itemsPerPage = (int) $request->query->get('itemsPerPage', 5);
+
+        $trainingPrograms = $this->entityManager->getRepository(TrainingProgram::class)->findAllByParams($page, $itemsPerPage, $request->query->all());
 
         return $this->json(['data' => $trainingPrograms], Response::HTTP_OK);
     }

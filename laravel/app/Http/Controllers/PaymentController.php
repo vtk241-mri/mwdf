@@ -4,21 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Membership;
 use App\Models\Payment;
+use App\Repository\PaymentRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class PaymentController extends Controller
 {
+    public const ITEMS_PER_PAGE = 5;
+
+    /**
+     * @param PaymentRepository $paymentRepository
+     */
+    public function __construct(private readonly PaymentRepository $paymentRepository)
+    {
+    }
+
     /**
      * READ - список усіх оплат (разом з абонементом)
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getPayments(): mixed
+    public function getPayments(Request $request): mixed
     {
-        $payments = Payment::with('membership')->get();
+        $itemsPerPage = (int) $request->get('itemsPerPage', self::ITEMS_PER_PAGE);
 
-        return response()->json(['data' => $payments], Response::HTTP_OK);
+        $payments = $this->paymentRepository->getPayments($request->all(), $itemsPerPage);
+
+        return response()->json($payments, Response::HTTP_OK);
     }
 
     /**

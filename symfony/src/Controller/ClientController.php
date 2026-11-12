@@ -22,12 +22,16 @@ class ClientController extends AbstractController
     /**
      * READ - список усіх клієнтів
      *
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/clients', name: 'get_clients', methods: [Request::METHOD_GET])]
-    public function getClients(): JsonResponse
+    public function getClients(Request $request): JsonResponse
     {
-        $clients = $this->entityManager->getRepository(Client::class)->findAll();
+        $page = (int) $request->query->get('page', 1);
+        $itemsPerPage = (int) $request->query->get('itemsPerPage', 5);
+
+        $clients = $this->entityManager->getRepository(Client::class)->findAllByParams($page, $itemsPerPage, $request->query->all());
 
         return $this->json(['data' => $clients], Response::HTTP_OK);
     }

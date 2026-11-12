@@ -2,10 +2,11 @@
 
 namespace App\Entity;
 
+use App\Repository\PaymentRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PaymentRepository::class)]
 class Payment
 {
     #[ORM\Id]

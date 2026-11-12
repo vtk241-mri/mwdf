@@ -5,21 +5,34 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Membership;
 use App\Models\TrainingProgram;
+use App\Repository\MembershipRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class MembershipController extends Controller
 {
+    public const ITEMS_PER_PAGE = 5;
+
+    /**
+     * @param MembershipRepository $membershipRepository
+     */
+    public function __construct(private readonly MembershipRepository $membershipRepository)
+    {
+    }
+
     /**
      * READ - список усіх абонементів (разом з клієнтом і програмою)
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getMemberships(): mixed
+    public function getMemberships(Request $request): mixed
     {
-        $memberships = Membership::with(['client', 'trainingProgram'])->get();
+        $itemsPerPage = (int) $request->get('itemsPerPage', self::ITEMS_PER_PAGE);
 
-        return response()->json(['data' => $memberships], Response::HTTP_OK);
+        $memberships = $this->membershipRepository->getMemberships($request->all(), $itemsPerPage);
+
+        return response()->json($memberships, Response::HTTP_OK);
     }
 
     /**

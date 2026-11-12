@@ -24,12 +24,16 @@ class MembershipController extends AbstractController
     /**
      * READ - список усіх абонементів
      *
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/memberships', name: 'get_memberships', methods: [Request::METHOD_GET])]
-    public function getMemberships(): JsonResponse
+    public function getMemberships(Request $request): JsonResponse
     {
-        $memberships = $this->entityManager->getRepository(Membership::class)->findAll();
+        $page = (int) $request->query->get('page', 1);
+        $itemsPerPage = (int) $request->query->get('itemsPerPage', 5);
+
+        $memberships = $this->entityManager->getRepository(Membership::class)->findAllByParams($page, $itemsPerPage, $request->query->all());
 
         return $this->json(['data' => $memberships], Response::HTTP_OK);
     }
