@@ -3,21 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Repository\ClientRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ClientController extends Controller
 {
+    public const ITEMS_PER_PAGE = 5;
+
+    /**
+     * @param ClientRepository $clientRepository
+     */
+    public function __construct(private readonly ClientRepository $clientRepository)
+    {
+    }
+
     /**
      * READ - список усіх клієнтів
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getClients(): mixed
+    public function getClients(Request $request): mixed
     {
-        $clients = Client::all();
+        $itemsPerPage = (int) $request->get('itemsPerPage', self::ITEMS_PER_PAGE);
 
-        return response()->json(['data' => $clients], Response::HTTP_OK);
+        $clients = $this->clientRepository->getClients($request->all(), $itemsPerPage);
+
+        return response()->json($clients, Response::HTTP_OK);
     }
 
     /**

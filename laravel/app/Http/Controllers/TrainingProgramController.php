@@ -4,21 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Models\Trainer;
 use App\Models\TrainingProgram;
+use App\Repository\TrainingProgramRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class TrainingProgramController extends Controller
 {
+    public const ITEMS_PER_PAGE = 5;
+
+    /**
+     * @param TrainingProgramRepository $trainingProgramRepository
+     */
+    public function __construct(private readonly TrainingProgramRepository $trainingProgramRepository)
+    {
+    }
+
     /**
      * READ - список усіх програм тренувань (разом з тренером)
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getTrainingPrograms(): mixed
+    public function getTrainingPrograms(Request $request): mixed
     {
-        $trainingPrograms = TrainingProgram::with('trainer')->get();
+        $itemsPerPage = (int) $request->get('itemsPerPage', self::ITEMS_PER_PAGE);
 
-        return response()->json(['data' => $trainingPrograms], Response::HTTP_OK);
+        $trainingPrograms = $this->trainingProgramRepository->getTrainingPrograms($request->all(), $itemsPerPage);
+
+        return response()->json($trainingPrograms, Response::HTTP_OK);
     }
 
     /**

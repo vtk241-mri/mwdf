@@ -23,12 +23,16 @@ class PaymentController extends AbstractController
     /**
      * READ - список усіх оплат
      *
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/payments', name: 'get_payments', methods: [Request::METHOD_GET])]
-    public function getPayments(): JsonResponse
+    public function getPayments(Request $request): JsonResponse
     {
-        $payments = $this->entityManager->getRepository(Payment::class)->findAll();
+        $page = (int) $request->query->get('page', 1);
+        $itemsPerPage = (int) $request->query->get('itemsPerPage', 5);
+
+        $payments = $this->entityManager->getRepository(Payment::class)->findAllByParams($page, $itemsPerPage, $request->query->all());
 
         return $this->json(['data' => $payments], Response::HTTP_OK);
     }

@@ -3,21 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trainer;
+use App\Repository\TrainerRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class TrainerController extends Controller
 {
+    public const ITEMS_PER_PAGE = 5;
+
+    /**
+     * @param TrainerRepository $trainerRepository
+     */
+    public function __construct(private readonly TrainerRepository $trainerRepository)
+    {
+    }
+
     /**
      * READ - список усіх тренерів
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getTrainers(): mixed
+    public function getTrainers(Request $request): mixed
     {
-        $trainers = Trainer::all();
+        $itemsPerPage = (int) $request->get('itemsPerPage', self::ITEMS_PER_PAGE);
 
-        return response()->json(['data' => $trainers], Response::HTTP_OK);
+        $trainers = $this->trainerRepository->getTrainers($request->all(), $itemsPerPage);
+
+        return response()->json($trainers, Response::HTTP_OK);
     }
 
     /**

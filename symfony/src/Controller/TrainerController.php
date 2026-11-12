@@ -22,12 +22,16 @@ class TrainerController extends AbstractController
     /**
      * READ - список усіх тренерів
      *
+     * @param Request $request
      * @return JsonResponse
      */
     #[Route('/trainers', name: 'get_trainers', methods: [Request::METHOD_GET])]
-    public function getTrainers(): JsonResponse
+    public function getTrainers(Request $request): JsonResponse
     {
-        $trainers = $this->entityManager->getRepository(Trainer::class)->findAll();
+        $page = (int) $request->query->get('page', 1);
+        $itemsPerPage = (int) $request->query->get('itemsPerPage', 5);
+
+        $trainers = $this->entityManager->getRepository(Trainer::class)->findAllByParams($page, $itemsPerPage, $request->query->all());
 
         return $this->json(['data' => $trainers], Response::HTTP_OK);
     }
